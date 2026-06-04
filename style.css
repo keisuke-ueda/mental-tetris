@@ -192,3 +192,64 @@ h2 { font-size: 13px; margin: 0 0 6px; opacity: .8; letter-spacing: .12em; }
   .board-wrap { width:min(calc((100svh - 12px) / 2), calc(100vw - 380px)); height:min(calc(100svh - 12px), calc((100vw - 380px) * 2)); }
   .mobile-controls { width:250px; height:auto; min-height:0; }
 }
+
+.talt-character {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+  transition: transform .25s ease, filter .25s ease;
+}
+
+.talt-character.happy {
+  transform: translateY(-8px) scale(1.08);
+  filter: drop-shadow(0 0 18px rgba(185,255,231,.75));
+}
+
+.achievement-toast,
+.gacha-toast {
+  position: fixed;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  z-index: 100;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: rgba(8,14,30,.96);
+  border: 1px solid rgba(185,255,231,.5);
+  color: #fff;
+  font-weight: 900;
+  text-align: center;
+  box-shadow: 0 18px 48px rgba(0,0,0,.45), 0 0 26px rgba(95,231,255,.25);
+}
+
+.emotion-float {
+  position: absolute;
+  pointer-events: none;
+  z-index: 30;
+  font-weight: 900;
+  color: #b9ffe7;
+  text-shadow: 0 0 12px rgba(95,231,255,.8);
+  animation: emotionFloat 1.2s ease forwards;
+}
+
+@keyframes emotionFloat {
+  0% { opacity: 0; transform: translateY(20px) scale(.8); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-70px) scale(1.15); }
+}
+
+
+@media (max-width: 760px) {
+  .talt-character {
+    width: 46px;
+    height: 46px;
+  }
+}
+
+@media (max-width: 390px), (max-height: 700px) {
+  .talt-character {
+    width: 40px;
+    height: 40px;
+  }
+}

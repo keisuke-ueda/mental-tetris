@@ -104,6 +104,37 @@
     progress_100: '今日はすごくよく整理できたね。',
   };
 
+  const CHARACTER_IMAGES = {
+    lv1: 'assets/character/talt_lv1.png',
+    lv3: 'assets/character/talt_lv3.png',
+    lv5: 'assets/character/talt_lv5.png',
+    lv8: 'assets/character/talt_lv8.png',
+    lv10: 'assets/character/talt_lv10.png'
+  };
+
+  const GACHA_SKINS = [
+    { id:'hoodie', name:'パーカータルト君', src:'assets/character/skin_hoodie.png' },
+    { id:'angel', name:'天使タルト君', src:'assets/character/skin_angel.png' },
+    { id:'hero', name:'勇者タルト君', src:'assets/character/skin_hero.png' },
+    { id:'king', name:'王様タルト君', src:'assets/character/skin_king.png' }
+  ];
+
+  const ACHIEVEMENTS = [
+    { id:'first_line', name:'初めて整理した', condition:()=>lines >= 1 },
+    { id:'ten_lines', name:'相談上手', condition:()=>lines >= 10 },
+    { id:'level5', name:'こころ整理人', condition:()=>level >= 5 },
+    { id:'score5000', name:'共感マスター', condition:()=>score >= 5000 }
+  ];
+
+  let unlockedAchievements = JSON.parse(localStorage.getItem('mentalTetrisAchievements') || '[]');
+  let unlockedSkins = JSON.parse(localStorage.getItem('mentalTetrisSkins') || '[]');
+  let gachaPoint = Number(localStorage.getItem('mentalTetrisGachaPoint') || 0);
+
+
+
+
+
+
 
   function talkLineByMood(){
     if(pendingLevelUp){
@@ -354,6 +385,107 @@
     document.querySelectorAll('[data-mood]').forEach(b=>b.classList.toggle('selected', b.dataset.mood===m));
     updateMentalProgress(true);
   }
+
+
+
+
+
+
+  function updateTaltCharacter(){
+    const img = document.getElementById('taltCharacter');
+    if(!img) return;
+
+    let src = CHARACTER_IMAGES.lv1;
+
+    if(level >= 10) src = CHARACTER_IMAGES.lv10;
+    else if(level >= 8) src = CHARACTER_IMAGES.lv8;
+    else if(level >= 5) src = CHARACTER_IMAGES.lv5;
+    else if(level >= 3) src = CHARACTER_IMAGES.lv3;
+
+    img.src = src;
+  }
+
+  function taltHappy(){
+    const img = document.getElementById('taltCharacter');
+    if(!img) return;
+
+    img.classList.add('happy');
+    setTimeout(()=>img.classList.remove('happy'), 400);
+  }
+
+  function showAchievement(name){
+    const div = document.createElement('div');
+    div.className = 'achievement-toast';
+    div.innerHTML = `🏆 実績解除<br>${name}`;
+    document.body.appendChild(div);
+
+    setTimeout(()=>div.remove(), 1800);
+  }
+
+  function checkAchievements(){
+    ACHIEVEMENTS.forEach(a=>{
+      if(unlockedAchievements.includes(a.id)) return;
+
+      if(a.condition()){
+        unlockedAchievements.push(a.id);
+        localStorage.setItem('mentalTetrisAchievements', JSON.stringify(unlockedAchievements));
+        showAchievement(a.name);
+        gachaPoint += 100;
+        localStorage.setItem('mentalTetrisGachaPoint', gachaPoint);
+      }
+    });
+  }
+
+  function emotionFloat(text){
+    const wrap = document.querySelector('.board-wrap');
+    if(!wrap) return;
+
+    const div = document.createElement('div');
+    div.className = 'emotion-float';
+    div.textContent = text;
+
+    div.style.left = `${30 + Math.random() * 40}%`;
+    div.style.top = `${45 + Math.random() * 25}%`;
+
+    wrap.appendChild(div);
+    setTimeout(()=>div.remove(), 1200);
+  }
+
+  function runGacha(){
+    if(gachaPoint < 300){
+      toast('ガチャポイントが足りません');
+      return;
+    }
+
+    gachaPoint -= 300;
+    localStorage.setItem('mentalTetrisGachaPoint', gachaPoint);
+
+    const item = GACHA_SKINS[Math.floor(Math.random() * GACHA_SKINS.length)];
+
+    if(!unlockedSkins.includes(item.id)){
+      unlockedSkins.push(item.id);
+      localStorage.setItem('mentalTetrisSkins', JSON.stringify(unlockedSkins));
+    }
+
+    const div = document.createElement('div');
+    div.className = 'gacha-toast';
+    div.innerHTML = `🎁 ガチャGET<br>${item.name}`;
+    document.body.appendChild(div);
+
+    setTimeout(()=>div.remove(), 2000);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -612,6 +744,8 @@
     lines += count; return count;
   }
 
+
+
   function applyScore(cleared, tspin){
     const fullT = tspin === 'full';
     const miniT = tspin === 'mini';
@@ -665,8 +799,21 @@
     } else {
       combo = -1;
     }
+    emotionFloat(activeMood === 'anxiety' ? '不安を整理' :
+             activeMood === 'anger' ? 'イライラ整理' :
+             activeMood === 'sadness' ? '悲しみ整理' :
+             activeMood === 'fatigue' ? '疲れを休ませた' :
+             'こころ整理');
+
+    taltHappy();
+
+    gachaPoint += cleared * 10;
+    localStorage.setItem('mentalTetrisGachaPoint', gachaPoint);
   }
 
+
+
+  
   function ghostY(){ let y=current.y; while(!collides(current.x,y+1,current.matrix)) y++; return y; }
   
 
@@ -757,7 +904,24 @@
     queue.slice(0,4).forEach((t,i)=>drawPreview(nextCtx,t,i*2+1));
   }
 
-  function updateUI(){ el.score.textContent=score; el.lines.textContent=lines; el.level.textContent=level; el.combo.textContent=Math.max(0,combo); updateMentalProgress(); }
+  
+  
+  function updateUI(){
+    el.score.textContent = score;
+    el.lines.textContent = lines;
+    el.level.textContent = level;
+    el.combo.textContent = Math.max(0, combo);
+
+    updateMentalProgress();
+    updateTaltCharacter();
+    checkAchievements();
+  }
+    
+    
+  
+  
+  
+  
   function setEffect(t){ el.effect.textContent = t; }
   function showMessage(t){ el.msg.textContent=t; el.msg.classList.remove('hidden'); }
   function hideMessage(){ el.msg.classList.add('hidden'); }
