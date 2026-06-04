@@ -1,0 +1,133 @@
+.board-wrap.result-open .message.result-message {
+  z-index: 20;
+  place-items: start center;
+  padding: 10px 8px 0;
+  font-size: 13px;
+  line-height: 1.28;
+  background: rgba(0,0,0,.62);
+}
+
+.result-panel {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  width: 94%;
+  max-width: 286px;
+  z-index: 50;
+  background: rgba(8, 14, 30, 0.96);
+  border: 1px solid rgba(185, 255, 231, 0.42);
+  border-radius: 14px;
+  padding: 10px;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 18px 48px rgba(0,0,0,.45), 0 0 24px rgba(95,231,255,.14);
+  pointer-events: auto;
+}
+
+.result-panel.hidden {
+  display: none;
+}
+
+.result-panel__title {
+  font-weight: 900;
+  color: #b9ffe7;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.result-panel__label {
+  display: block;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(255,255,255,.82);
+}
+
+.result-panel input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.95);
+  color: #071020;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.result-panel__buttons {
+  display: flex;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.result-panel button {
+  flex: 1;
+  padding: 8px 5px;
+  border-radius: 9px;
+  font-weight: 900;
+  background: linear-gradient(90deg,#5fe7ff,#b9ffe7);
+  color: #071020;
+  font-size: 12px;
+}
+
+.ranking-status {
+  min-height: 16px;
+  margin-top: 5px;
+  font-size: 11px;
+  color: #b9ffe7;
+}
+
+.result-panel h3 {
+  margin: 5px 0 4px;
+  font-size: 13px;
+}
+
+.ranking-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.ranking-list li {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 3px;
+  padding: 1px 0;
+}
+
+.ranking-rank {
+  color: #b9ffe7;
+  font-weight: 900;
+  text-align: right;
+}
+
+.ranking-body {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-height: 700px) {
+  .board-wrap.result-open .message.result-message {
+    font-size: 12px;
+    line-height: 1.22;
+  }
+
+  .result-panel {
+    bottom: 6px;
+    padding: 9px;
+  }
+
+  .ranking-list {
+    max-height: 136px;
+    font-size: 11.5px;
+    line-height: 1.38;
+  }
+}

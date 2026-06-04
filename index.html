@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <!-- X / OGP サムネイル設定：公開URLに合わせて書き換えてください -->
+  <meta property="og:title" content="メンタルテトリス">
+  <meta property="og:description" content="悩みを整理するパズルゲーム｜悩みと学びの処方せん Official Game">
+  <meta property="og:image" content="https://www.field-up.work//mental-tetris/assets/img/mental-tetris-ogp.png">
+  <meta property="og:url" content="https://www.field-up.work//mental-tetris/">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>メンタルテトリス | 悩みと学びの処方せん Official Game</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="result-panel.css" />
+</head>
+<body>
+  <div class="bg-stars" aria-hidden="true"></div>
+
+  <div id="titleScreen" class="title-screen">
+    <div class="title-card">
+      <p class="official">悩みと学びの処方せん Official Game</p>
+      <h1><span>MENTAL</span><span>TETRIS</span></h1>
+      <p class="subtitle">暗い気分から、少しずつ前向きに整えるパズルゲーム</p>
+
+      <div class="mood-select" aria-label="mood select">
+        <button data-mood="normal" class="selected">普通</button>
+        <button data-mood="anxiety">不安</button>
+        <button data-mood="anger">イライラ</button>
+        <button data-mood="sadness">悲しい</button>
+        <button data-mood="fatigue">疲れた</button>
+      </div>
+
+      <button id="startBtn" class="start-btn">START</button>
+      <p class="howto">PC: ←→↓ / Z X 回転 / C HOLD / Space DROP<br>SP: 下部ボタンで操作</p>
+    </div>
+  </div>
+
+  <main class="app">
+    <section class="topbar">
+      <div><span>メンタルテトリス</span><small>悩みと学びの処方せん</small></div>
+      <button id="bgmBtn">BGM ON</button>
+      <button id="seBtn">SE ON</button>
+      <button id="pauseBtn">PAUSE</button>
+      <button id="restartBtn">RESTART</button>
+    </section>
+
+    <section class="game-layout">
+
+      
+      <aside class="panel left-panel">
+        <div class="box">
+          <h2>あとで考える</h2>
+          <canvas id="hold" width="96" height="96"></canvas>
+        </div>
+        <div class="stats">
+          <p>共感ポイント <b id="score">0</b></p>
+          <p>整理した悩み <b id="lines">0</b></p>
+          <p>こころ整理Lv <b id="level">1</b></p>
+          <p>気付きコンボ <b id="combo">0</b></p>
+        </div>
+      </aside>
+
+      <section class="board-wrap">
+        <canvas id="board" width="300" height="600"></canvas>
+        <canvas id="fx" width="300" height="600"></canvas>
+        <div id="toast" class="toast hidden"></div>
+        <div id="message" class="message hidden"></div>
+
+        <!-- ゲームオーバー時だけ game.js が表示します -->
+        <div id="resultPanel" class="result-panel hidden">
+          <div class="result-panel__title">今日の結果を登録・シェア</div>
+
+          <label class="result-panel__label">
+            名前
+            <input id="playerName" maxlength="12" placeholder="12文字まで">
+          </label>
+
+          <div class="result-panel__buttons">
+            <button id="saveRankingBtn" type="button">ランキング登録</button>
+            <button id="shareXBtn" type="button">Xでシェア</button>
+          </div>
+
+          <div id="rankingStatus" class="ranking-status"></div>
+
+          <h3>ランキング TOP10</h3>
+          <ol id="rankingList" class="ranking-list"></ol>
+        </div>
+      </section>
+
+      <aside class="panel right-panel">
+        <div class="box">
+          <h2>これから来る悩み</h2>
+          <canvas id="next" width="96" height="240"></canvas>
+        </div>
+        <div class="effect" id="effectText">READY</div>
+      </aside>
+    </section>
+
+    <section class="mobile-controls" aria-label="mobile controls">
+      <div class="control-pad move-pad">
+        <button class="wide" data-action="left">←</button>
+        <button class="wide" data-action="right">→</button>
+        <button class="drop-soft" data-action="down">↓ SOFT</button>
+      </div>
+      <div class="control-pad action-pad">
+        <button data-action="ccw">↺ 左回転</button>
+        <button data-action="cw">↻ 右回転</button>
+        <button data-action="hold">HOLD</button>
+        <button class="drop-hard" data-action="hard">DROP</button>
+      </div>
+    </section>
+
+    <section class="talt">
+      <div class="talt-face">処</div>
+      <div id="taltBubble" class="talt-bubble">焦らなくて大丈夫。少しずつ整理しよう。</div>
+    </section>
+
+    <aside class="keyboard-help">
+      <h3>PC操作</h3>
+      <p><b>← →</b>：移動</p>
+      <p><b>↓</b>：ソフトドロップ</p>
+      <p><b>Z</b>：左回転</p>
+      <p><b>X / ↑</b>：右回転</p>
+      <p><b>C</b>：ホールド</p>
+      <p><b>Space</b>：ハードドロップ</p>
+      <p><b>P</b>：一時停止</p>
+    </aside>
+
+  </main>
+
+  <script src="config.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
