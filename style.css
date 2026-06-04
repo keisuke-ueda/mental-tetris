@@ -8,7 +8,13 @@ html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; overscroll-
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #fff;
-  background: radial-gradient(circle at top, #26365f 0%, #071020 55%, #030713 100%);
+  background:
+    radial-gradient(
+      circle at top,
+      #8ddcff 0%,
+      #4f8cff 45%,
+      #183c7d 100%
+    );
 }
 body::after {
   content:""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
@@ -28,7 +34,19 @@ button { font: inherit; border: 0; cursor: pointer; user-select: none; touch-act
   radial-gradient(circle at 20% 20%, rgba(90,220,255,.18), transparent 28%),
   radial-gradient(circle at 80% 10%, rgba(160,120,255,.18), transparent 30%),
   radial-gradient(circle at 50% 100%, rgba(80,255,190,.12), transparent 36%); }
-.bg-stars::before, .bg-stars::after { content:""; position:absolute; inset:-40%; background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 38px 38px; opacity:calc(.09 + var(--mental-progress, 0) * .22); animation: drift 28s linear infinite; }
+.bg-stars::before, .bg-stars::after { content:""; position:absolute; inset:-40%; background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 38px 38px; 
+  
+  
+  opacity:calc(.18 + var(--mental-progress, 0) * .35); 
+  
+  
+  animation: drift 28s linear infinite; 
+
+
+}
+
+
+
 .bg-stars::after { background-size: 71px 71px; opacity:calc(.06 + var(--mental-progress, 0) * .15); animation-duration: 46s; animation-direction: reverse; }
 @keyframes drift { to { transform: translate3d(80px,120px,0); } }
 body[data-mood="normal"] { background: radial-gradient(circle at top, #202f54 0%, #081124 58%, #030713 100%); }
@@ -50,7 +68,13 @@ body[data-progress="bright"] #board, body[data-progress="hope"] #board { box-sha
 .game-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: 130px auto 130px; gap: 10px; align-items: center; justify-content: center; }
 .mobile-game-info { display: none; }
 .board-wrap { position: relative; height: min(calc(100dvh - 160px), 620px); aspect-ratio: 1 / 2; display: flex; overflow:hidden; }
-#board { width: 100%; height: 100%; border: 4px solid rgba(170,190,255,.38); border-radius: 14px; background: rgba(4,8,20, calc(.9 - var(--mental-progress, 0) * .18)); box-shadow: 0 18px 60px rgba(0,0,0,.45), inset 0 0 26px rgba(95,231,255,.08); }
+
+
+#board {
+  background: rgba(25,40,80,.75);
+}
+
+
 #fx { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; border-radius:14px; }
 .panel { align-self: stretch; display: flex; flex-direction: column; gap: 10px; justify-content: center; min-width: 0; }
 .box, .stats { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 10px; }
