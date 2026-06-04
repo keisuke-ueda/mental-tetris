@@ -253,3 +253,223 @@ h2 { font-size: 13px; margin: 0 0 6px; opacity: .8; letter-spacing: .12em; }
     height: 40px;
   }
 }
+
+.sp-flick-guide {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .sp-flick-guide {
+    grid-column: 1 / 4;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    margin-bottom: 3px;
+    padding: 4px;
+    border-radius: 10px;
+    background: rgba(8,14,30,.78);
+    border: 1px solid rgba(185,255,231,.25);
+    font-size: 10px;
+    font-weight: 800;
+    color: rgba(255,255,255,.9);
+    text-align: center;
+  }
+
+  .sp-flick-guide span {
+    padding: 4px 2px;
+    border-radius: 7px;
+    background: rgba(255,255,255,.08);
+    white-space: nowrap;
+  }
+
+  .game-layout {
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "guide guide guide"
+      "left board right";
+  }
+}
+
+@media (max-width: 390px), (max-height: 700px) {
+  .sp-flick-guide {
+    font-size: 9px;
+    gap: 3px;
+    padding: 3px;
+  }
+
+  .sp-flick-guide span {
+    padding: 3px 1px;
+  }
+}
+
+.gacha-toast{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(8px);
+}
+
+.gacha-title{
+  font-size:28px;
+  font-weight:900;
+  color:#ffe45f;
+  margin-bottom:12px;
+}
+
+.gacha-result-img{
+  width:280px;
+  max-width:70vw;
+  height:auto;
+
+  animation:gachaPop .4s ease;
+}
+
+.gacha-name{
+  margin-top:12px;
+  font-size:22px;
+  font-weight:900;
+  color:white;
+}
+
+@keyframes gachaPop{
+  from{
+    transform:scale(.4);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+/* ガチャ演出：中央表示 */
+.gacha-toast {
+  position: fixed !important;
+  inset: 0 !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: none !important;
+  z-index: 99999 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 20px !important;
+  background:
+    radial-gradient(circle at center, rgba(95,231,255,.22), transparent 42%),
+    rgba(0,0,0,.82) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.gacha-card {
+  width: min(86vw, 360px);
+  min-height: 420px;
+  padding: 22px 18px;
+  border-radius: 26px;
+  background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(8,14,30,.96));
+  border: 1px solid rgba(185,255,231,.45);
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.55),
+    0 0 34px rgba(95,231,255,.28);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: gachaCardPop .42s ease both;
+}
+
+.gacha-title {
+  font-size: 24px;
+  font-weight: 1000;
+  color: #ffe45f;
+  text-shadow: 0 0 18px rgba(255,228,95,.45);
+  margin-bottom: 12px;
+}
+
+.gacha-result-img {
+  width: min(68vw, 260px);
+  height: min(68vw, 260px);
+  object-fit: contain;
+  display: block;
+  margin: 4px auto 12px;
+  filter: drop-shadow(0 18px 28px rgba(0,0,0,.45));
+  animation: gachaImgPop .55s cubic-bezier(.2,1.4,.35,1) both;
+}
+
+.gacha-name {
+  font-size: 20px;
+  font-weight: 1000;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.gacha-close {
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: 900;
+  background: linear-gradient(90deg,#5fe7ff,#b9ffe7);
+  color: #071020;
+}
+
+@keyframes gachaCardPop {
+  from {
+    opacity: 0;
+    transform: scale(.82) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes gachaImgPop {
+  from {
+    opacity: 0;
+    transform: scale(.4) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .gacha-card {
+    width: 88vw;
+    min-height: 360px;
+    padding: 18px 14px;
+  }
+
+  .gacha-title {
+    font-size: 20px;
+  }
+
+  .gacha-result-img {
+    width: min(72vw, 220px);
+    height: min(72vw, 220px);
+  }
+
+  .gacha-name {
+    font-size: 17px;
+  }
+}
+
+.gacha-note {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #b9ffe7;
+  text-align: center;
+}

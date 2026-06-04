@@ -31,7 +31,11 @@
     combo: document.getElementById('combo'), effect: document.getElementById('effectText'), msg: document.getElementById('message'),
     pause: document.getElementById('pauseBtn'), restart: document.getElementById('restartBtn'),
     bgm: document.getElementById('bgmBtn'), se: document.getElementById('seBtn'), start: document.getElementById('startBtn'), title: document.getElementById('titleScreen'), toast: document.getElementById('toast'), talt: document.getElementById('taltBubble'),
-    resultPanel: document.getElementById('resultPanel'), playerName: document.getElementById('playerName'), saveRanking: document.getElementById('saveRankingBtn'), shareX: document.getElementById('shareXBtn'), rankingList: document.getElementById('rankingList'), rankingStatus: document.getElementById('rankingStatus')
+    resultPanel: document.getElementById('resultPanel'), playerName: document.getElementById('playerName'), saveRanking: document.getElementById('saveRankingBtn'), shareX: document.getElementById('shareXBtn'), 
+    rankingList: document.getElementById('rankingList'),
+    rankingStatus: document.getElementById('rankingStatus'),
+    gachaBtn: document.getElementById('gachaBtn'),
+    gachaPointText: document.getElementById('gachaPointText')
   };
 
 
@@ -413,6 +417,8 @@
     setTimeout(()=>img.classList.remove('happy'), 400);
   }
 
+
+
   function showAchievement(name){
     const div = document.createElement('div');
     div.className = 'achievement-toast';
@@ -421,6 +427,9 @@
 
     setTimeout(()=>div.remove(), 1800);
   }
+
+
+
 
   function checkAchievements(){
     ACHIEVEMENTS.forEach(a=>{
@@ -451,13 +460,17 @@
     setTimeout(()=>div.remove(), 1200);
   }
 
+
+
   function runGacha(){
-    if(gachaPoint < 300){
-      toast('ガチャポイントが足りません');
+    const GACHA_COST = 1000;
+
+    if(gachaPoint < GACHA_COST){
+      toast(`ガチャポイントが足りません (${GACHA_COST}pt必要)`);
       return;
     }
 
-    gachaPoint -= 300;
+    gachaPoint -= GACHA_COST;
     localStorage.setItem('mentalTetrisGachaPoint', gachaPoint);
 
     const item = GACHA_SKINS[Math.floor(Math.random() * GACHA_SKINS.length)];
@@ -467,17 +480,44 @@
       localStorage.setItem('mentalTetrisSkins', JSON.stringify(unlockedSkins));
     }
 
+    document.querySelectorAll('.gacha-toast').forEach(el => el.remove());
+
     const div = document.createElement('div');
     div.className = 'gacha-toast';
-    div.innerHTML = `🎁 ガチャGET<br>${item.name}`;
+
+    
+    div.innerHTML = `
+      <div class="gacha-card">
+        <div class="gacha-title">🎁 ガチャGET</div>
+        <p class="gacha-note">スクショして保存してね！</p>
+        <img src="${item.src}" class="gacha-result-img" alt="${item.name}">
+        <div class="gacha-name">${item.name}</div>
+        <button class="gacha-close" type="button">閉じる</button>
+      </div>`;
+
+
     document.body.appendChild(div);
 
-    setTimeout(()=>div.remove(), 2000);
+    div.querySelector('.gacha-close')?.addEventListener('click', () => {
+      div.remove();
+    });
+
+    updateGachaUI();
   }
 
 
 
 
+  function updateGachaUI(){
+    if(el.gachaPointText){
+      el.gachaPointText.textContent = `ガチャpt：${gachaPoint} / 1000`;
+    }
+
+    if(el.gachaBtn){
+      el.gachaBtn.disabled = gachaPoint < 1000;
+      el.gachaBtn.textContent = gachaPoint >= 1000 ? '🎁 ガチャを引く' : '🎁 1000ptでガチャ';
+    }
+  }
 
 
 
@@ -707,6 +747,7 @@
     if(!cleared && tspin === 'none') playSE('lock');
     applyScore(cleared, tspin);
     const levelUpOccurred = refreshLevel();
+    checkAchievements();
     if(cleared) burst(cleared);
     spawn(); updateUI(); draw();
   }
@@ -799,21 +840,23 @@
     } else {
       combo = -1;
     }
-    emotionFloat(activeMood === 'anxiety' ? '不安を整理' :
-             activeMood === 'anger' ? 'イライラ整理' :
-             activeMood === 'sadness' ? '悲しみ整理' :
-             activeMood === 'fatigue' ? '疲れを休ませた' :
-             'こころ整理');
 
-    taltHappy();
+    if(cleared > 0){
+      emotionFloat(activeMood === 'anxiety' ? '不安を整理' :
+                  activeMood === 'anger' ? 'イライラ整理' :
+                  activeMood === 'sadness' ? '悲しみ整理' :
+                  activeMood === 'fatigue' ? '疲れを休ませた' :
+                  'こころ整理');
+      taltHappy();
+      gachaPoint += cleared * 10;
+      localStorage.setItem('mentalTetrisGachaPoint', gachaPoint);
+}
 
-    gachaPoint += cleared * 10;
-    localStorage.setItem('mentalTetrisGachaPoint', gachaPoint);
   }
 
 
 
-  
+
   function ghostY(){ let y=current.y; while(!collides(current.x,y+1,current.matrix)) y++; return y; }
   
 
@@ -912,11 +955,9 @@
     el.level.textContent = level;
     el.combo.textContent = Math.max(0, combo);
 
-    updateMentalProgress();
-    updateTaltCharacter();
-    checkAchievements();
+    updateGachaUI();
   }
-    
+      
     
   
   
@@ -939,6 +980,7 @@
     if(el.resultPanel){
       el.resultPanel.classList.remove('hidden');
       loadRanking();
+      updateGachaUI();
     }
   }
 
@@ -1162,6 +1204,11 @@ function togglePause(){ if(over) return; paused=!paused; paused ? showMessage('�
 
   el.restart.addEventListener('click', ()=>{
     stopBgm();
+
+    document.querySelectorAll(
+      '.gacha-toast, .achievement-toast, .emotion-float'
+    ).forEach(el => el.remove());
+
     gameStarted = false;
     reset();
 
@@ -1175,6 +1222,8 @@ function togglePause(){ if(over) return; paused=!paused; paused ? showMessage('�
       el.resultPanel.classList.add('hidden');
     }
   });
+
+
 
 
   el.bgm.addEventListener('click', ()=>setBgm(!bgmOn)); el.se.addEventListener('click', ()=>setSe(!seOn));
@@ -1198,6 +1247,7 @@ function togglePause(){ if(over) return; paused=!paused; paused ? showMessage('�
   document.querySelectorAll('[data-mood]').forEach(btn=>btn.addEventListener('click', ()=>setMood(btn.dataset.mood)));
   el.saveRanking?.addEventListener('click', saveRanking);
   el.shareX?.addEventListener('click', shareToX);
+  el.gachaBtn?.addEventListener('click', runGacha);
   setBgm(bgmOn); setSe(seOn); setMood('normal');
 
   const action = { left:()=>move(-1), right:()=>move(1), down:softDrop, ccw:()=>rotate(-1), cw:()=>rotate(1), hard:hardDrop, hold:holdPiece };
