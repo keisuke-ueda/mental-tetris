@@ -1,7 +1,7 @@
 // メンタルテトリス設定ファイル
 // 本番公開時は SITE_URL と OGP のURLを実際のURLに変更してください。
 
-window.MENTAL_TETRIS_SITE_URL = 'https://www.field-up.work//mental-tetris/';
+window.MENTAL_TETRIS_SITE_URL = 'https://www.field-up.work/mental-tetris/';
 
 window.MENTAL_TETRIS_AUDIO_CONFIG = {
   bgm: {

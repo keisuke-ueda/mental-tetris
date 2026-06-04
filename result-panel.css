@@ -1,3 +1,7 @@
+/* =========================================================
+   Mental Tetris - Result Panel CSS
+========================================================= */
+
 .board-wrap.result-open .message.result-message {
   z-index: 20;
   place-items: start center;
@@ -25,9 +29,7 @@
   pointer-events: auto;
 }
 
-.result-panel.hidden {
-  display: none;
-}
+.result-panel.hidden { display: none; }
 
 .result-panel__title {
   font-weight: 900;
@@ -72,6 +74,11 @@
   font-size: 12px;
 }
 
+.result-panel button:disabled {
+  opacity: .72;
+  cursor: not-allowed;
+}
+
 .ranking-status {
   min-height: 16px;
   margin-top: 5px;
@@ -112,6 +119,29 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+@media (max-width: 760px) {
+  .board-wrap.result-open .message.result-message {
+    padding: 8px 6px 0;
+    font-size: 12px;
+    line-height: 1.22;
+  }
+
+  .result-panel {
+    bottom: 6px;
+    width: 94%;
+    max-width: 270px;
+    padding: 9px;
+  }
+
+  .result-panel__title { font-size: 12px; }
+
+  .ranking-list {
+    max-height: 136px;
+    font-size: 11px;
+    line-height: 1.38;
+  }
 }
 
 @media (max-height: 700px) {

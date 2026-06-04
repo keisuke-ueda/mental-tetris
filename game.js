@@ -2,7 +2,15 @@
   'use strict';
 
   // SPでプレイ中に画面が動かないようにする
-  document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+  document.addEventListener('touchmove', e => {
+    if(e.target.closest('.mobile-controls')){
+      e.preventDefault();
+    }
+
+  }, { passive:false });
+
+
+
   document.addEventListener('gesturestart', e => e.preventDefault());
 
   const COLS = 10, ROWS = 20, CELL = 30;
@@ -59,13 +67,16 @@
   };
 
   // 公開URLは本番環境に合わせて変更してください。Xカード画像はindex.htmlのOGPで設定します。
-  const SHARE_SITE_URL = window.MENTAL_TETRIS_SITE_URL || 'https://www.field-up.work//mental-tetris/';
+  const SHARE_SITE_URL = window.MENTAL_TETRIS_SITE_URL || 'https://www.field-up.work/mental-tetris/';
 
   let audioCtx = null;
   let bgmOn = localStorage.getItem('mentalTetrisBgm') !== 'off';
   let seOn = localStorage.getItem('mentalTetrisSe') !== 'off';
   let voiceOn = localStorage.getItem('mentalTetrisVoice') !== 'off';
+
   let currentBgm = null;
+  let bgmWatchTimer = null;
+
   let particles = [], rings = [], activeMood = 'normal', mentalProgress = 0, lastProgressStep = -1;
   let progressVoiceStep = 0;
   let suppressProgressVoiceOnce = false;
@@ -142,15 +153,58 @@
     }
   }
 
+
+
+
   function makeAudio(src, volume=1, loop=false){
     if(!src) return null;
+
     const a = new Audio(src);
     a.preload = 'auto';
     a.volume = Math.max(0, Math.min(1, volume));
     a.loop = loop;
-    a.addEventListener('error', () => { a.dataset.failed = '1'; }, { once: true });
+    a.playsInline = true;
+
+    if(loop){
+
+      a.addEventListener('ended', () => {
+
+        if(!bgmOn || !gameStarted || over) return;
+
+        a.currentTime = 0;
+        a.play().catch(()=>{});
+
+      });
+
+      a.addEventListener('pause', () => {
+
+        if(
+          bgmOn &&
+          gameStarted &&
+          !over &&
+          !document.hidden
+        ){
+          setTimeout(() => {
+            if(a.paused){
+              a.play().catch(()=>{});
+            }
+          },250);
+        }
+
+      });
+
+    }
+
+    a.addEventListener('error', () => {
+      a.dataset.failed='1';
+    }, {once:true});
+
     return a;
   }
+
+
+
+
 
   const AudioManager = {
     bgm: {}, se: {}, voice: {},
@@ -167,12 +221,33 @@
       if(!bgm || bgm.dataset.failed === '1') return this.fallbackBgm();
       if(currentBgm && currentBgm !== bgm) this.stopBgm();
       currentBgm = bgm;
+      currentBgm.loop = true;
+      this.startBgmWatch();
       bgm.play().catch(() => this.fallbackBgm());
     },
     stopBgm(){
+      this.stopBgmWatch();
       if(currentBgm){ currentBgm.pause(); currentBgm.currentTime = 0; }
       currentBgm = null;
       this.stopFallbackBgm();
+    },
+    startBgmWatch(){
+      this.stopBgmWatch();
+
+      bgmWatchTimer = setInterval(() => {
+        if(!bgmOn || !gameStarted || over || document.hidden) return;
+
+        if(currentBgm && (currentBgm.paused || currentBgm.ended)){
+          currentBgm.play().catch(()=>{});
+        }
+      }, 5000);
+    },
+
+    stopBgmWatch(){
+      if(bgmWatchTimer){
+        clearInterval(bgmWatchTimer);
+        bgmWatchTimer = null;
+      }
     },
     playSE(name){
       if(!seOn) return;
@@ -227,6 +302,27 @@
   };
 
   AudioManager.init();
+
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden){
+      return;
+    }
+
+    ensureAudio();
+
+    if(
+      gameStarted &&
+      bgmOn &&
+      !over
+    ){
+      startBgm();
+    }
+
+  });
+
+
+
   function playSE(name){ AudioManager.playSE(name); }
   function startBgm(){ AudioManager.playBgm('main'); }
   function stopBgm(){ AudioManager.stopBgm(); }
@@ -829,7 +925,13 @@
 function togglePause(){ if(over) return; paused=!paused; paused ? showMessage('少し休憩') : hideMessage(); }
 
   function loop(time=0){
-    const delta = lastTime ? time - lastTime : 0; lastTime = time;
+
+    let delta = lastTime ? time - lastTime : 0;
+    if(delta > 100){
+      delta = 100;
+    }
+  
+    lastTime = time;
     if(gameStarted && !paused && !over){
       dropCounter += delta;
       const interval = Math.max(260, 820 - (level-1)*45);
