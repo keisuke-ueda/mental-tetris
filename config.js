@@ -39,8 +39,8 @@ window.MENTAL_TETRIS_AUDIO_CONFIG = {
 
   volume: {
     bgm: 0.2,
-    se: 0.5,
-    voice: 0.8
+    se: 0.2,
+    voice: 0.5
   },
   fallbackBeep: true
 };

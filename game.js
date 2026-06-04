@@ -1037,9 +1037,12 @@ function togglePause(){ if(over) return; paused=!paused; paused ? showMessage('�
   setBgm(bgmOn); setSe(seOn); setMood('normal');
 
   const action = { left:()=>move(-1), right:()=>move(1), down:softDrop, ccw:()=>rotate(-1), cw:()=>rotate(1), hard:hardDrop, hold:holdPiece };
+  
+  
+  
   document.querySelectorAll('[data-action]').forEach(btn=>{
-    let timer=null;
 
+    let timer=null;
     const run=()=>{
       if(!gameStarted) return;
       ensureAudio();
@@ -1049,6 +1052,161 @@ function togglePause(){ if(over) return; paused=!paused; paused ? showMessage('�
     btn.addEventListener('pointerdown', e=>{ e.preventDefault(); run(); if(['left','right','down'].includes(btn.dataset.action)){ timer=setInterval(run, btn.dataset.action === 'down' ? 55 : 85); } });
     ['pointerup','pointercancel','pointerleave'].forEach(ev=>btn.addEventListener(ev,()=>{ if(timer) clearInterval(timer); timer=null; }));
   });
+
+
+
+
+  /* フリック処理 */
+  let flickStartX = 0;
+  let flickStartY = 0;
+  let flickStartTime = 0;
+
+  let swipeMoveTimer = null;
+  let swipeSoftTimer = null;
+  let swipeDirection = 0;
+  let swipeActive = false;
+  let softActive = false;
+
+  boardCanvas.style.touchAction = 'none';
+
+  function stopSwipeMove(){
+    if(swipeMoveTimer){
+      clearInterval(swipeMoveTimer);
+      swipeMoveTimer = null;
+    }
+    swipeDirection = 0;
+    swipeActive = false;
+  }
+
+  function stopSoftDrop(){
+    if(swipeSoftTimer){
+      clearInterval(swipeSoftTimer);
+      swipeSoftTimer = null;
+    }
+    softActive = false;
+  }
+
+  function stopAllSwipe(){
+    stopSwipeMove();
+    stopSoftDrop();
+  }
+
+  boardCanvas.addEventListener('pointerdown', e => {
+    if(!gameStarted || over || paused) return;
+    if(e.pointerType !== 'touch') return;
+
+    flickStartX = e.clientX;
+    flickStartY = e.clientY;
+    flickStartTime = Date.now();
+
+    stopAllSwipe();
+    e.preventDefault();
+  });
+
+  boardCanvas.addEventListener('pointermove', e => {
+    if(!gameStarted || over || paused) return;
+    if(e.pointerType !== 'touch') return;
+
+    const dx = e.clientX - flickStartX;
+    const dy = e.clientY - flickStartY;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    // 左右：微調整しやすく、軽めに反応
+    if(absX > 14 && absX > absY * 1.18){
+      stopSoftDrop();
+
+      const dir = dx > 0 ? 1 : -1;
+
+      if(!swipeActive || swipeDirection !== dir){
+        stopSwipeMove();
+
+        swipeDirection = dir;
+        swipeActive = true;
+
+        move(dir);
+
+        swipeMoveTimer = setInterval(() => {
+          if(!gameStarted || over || paused){
+            stopSwipeMove();
+            return;
+          }
+          move(swipeDirection);
+        }, 150);
+      }
+
+      e.preventDefault();
+      return;
+    }
+
+    // 下ロングフリック：押し続けている間SOFT
+    if(dy > 30 && absY > absX * 1.25){
+      stopSwipeMove();
+
+      if(!softActive){
+        softActive = true;
+        softDrop();
+
+        swipeSoftTimer = setInterval(() => {
+          if(!gameStarted || over || paused){
+            stopSoftDrop();
+            return;
+          }
+          softDrop();
+        }, 70);
+      }
+
+      e.preventDefault();
+      return;
+    }
+
+    e.preventDefault();
+  });
+
+  boardCanvas.addEventListener('pointerup', e => {
+    if(!gameStarted || over || paused){
+      stopAllSwipe();
+      return;
+    }
+    if(e.pointerType !== 'touch') return;
+
+    const elapsed = Date.now() - flickStartTime;
+    const dx = e.clientX - flickStartX;
+    const dy = e.clientY - flickStartY;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    const wasMoving = swipeActive;
+    const wasSoft = softActive;
+
+    stopAllSwipe();
+
+    // 上フリック：DROP
+    if(!wasMoving && !wasSoft && dy < -55 && absY > absX * 1.4 && elapsed < 360){
+      hardDrop();
+      return;
+    }
+
+    // タップ：左回転
+    if(!wasMoving && !wasSoft && absX < 14 && absY < 14 && elapsed < 260){
+      rotate(-1);
+    }
+
+    e.preventDefault();
+  });
+
+  boardCanvas.addEventListener('pointercancel', stopAllSwipe);
+  boardCanvas.addEventListener('pointerleave', stopAllSwipe);
+
+
+
+
+
+
+
+
+
+
 
   reset();
 
